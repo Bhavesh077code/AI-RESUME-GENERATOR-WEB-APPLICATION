@@ -1,0 +1,17 @@
+
+
+.template-modern {
+  font-family: Inter;
+  color: #111;
+}
+
+.template-classic {
+  font-family: "Times New Roman";
+  background: #f5f5f5;
+}
+
+.template-minimal {
+  font-family: Arial;
+  border-left: 5px solid black;
+  padding-left: 10px;
+}

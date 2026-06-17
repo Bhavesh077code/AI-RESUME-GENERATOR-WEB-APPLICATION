@@ -1,0 +1,36 @@
+@import "tailwindcss";
+
+.input {
+  @apply w-full border border-slate-300 rounded-xl px-4 py-3 outline-none focus:border-black transition bg-white;
+}
+
+
+
+
+@keyframes bounceSlow {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-15px);
+  }
+}
+
+.animate-bounce-slow {
+  animation: bounceSlow 5s infinite;
+}
+
+
+html, body {
+  overflow-x: hidden;
+}
+
+
+
+
+
+
+input, select, textarea {
+  font-size: 16px;
+}
