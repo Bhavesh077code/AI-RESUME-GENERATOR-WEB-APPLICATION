@@ -297,6 +297,7 @@ export const tech1 = (data) => {
           ${resumeContent.location ? `<div class="contact-item"><strong>Address</strong>${resumeContent.location}</div>` : ""}
           ${resumeContent.links?.portfolio ? `<div class="contact-item"><strong>Website</strong><a href="${resumeContent.links.portfolio}" target="_blank">${resumeContent.links.portfolio}</a></div>` : ""}
           ${resumeContent.links?.github ? `<div class="contact-item"><strong>GitHub</strong><a href="${resumeContent.links.github}" target="_blank">${resumeContent.links.github}</a></div>` : ""}
+          ${resumeContent.links?.linkedin ? `<div class="contact-item"><strong>LinkedIn</strong><a href="${resumeContent.links.linkedin}" target="_blank">${resumeContent.links.linkedin}</a></div>` : ""}
         </div>
       </div>
 
@@ -345,7 +346,7 @@ export const tech1 = (data) => {
           ${resumeContent.certification
             .map(
               (c) => `
-            <li><strong>${c.name || ""}</strong> <br><span style="font-size:11px; color:#666;">${c.issuer || ""}</span></li>
+            <li><strong>${c.name || ""}</strong> <br><span style="font-size:11px; color:#666;">${c.issuer || ""} | ${c.date || ""}</span></li>
           `,
             )
             .join("")}

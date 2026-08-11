@@ -281,7 +281,9 @@ export const creative1 = (data) => {
           ${resumeContent.location ? `<div class="contact-row"><strong>Address</strong>${resumeContent.location}</div>` : ''}
           ${resumeContent.phone ? `<div class="contact-row"><strong>Phone</strong>${resumeContent.phone}</div>` : ''}
           ${resumeContent.email ? `<div class="contact-row"><strong>Email</strong>${resumeContent.email}</div>` : ''}
-          ${resumeContent.links?.portfolio ? `<div class="contact-row"><strong>Web</strong><a href="${resumeContent.links.portfolio}" target="_blank">${resumeContent.links.portfolio}</a></div>` : ''}
+          ${resumeContent.links?.portfolio ? `<div class="contact-row"><strong>Website</strong><a href="${resumeContent.links.portfolio}" target="_blank">${resumeContent.links.portfolio}</a></div>` : ''}
+          ${resumeContent.links?.linkedin ? `<div class="contact-row"><strong>LinkedIn</strong><a href="${resumeContent.links.linkedin}" target="_blank">${resumeContent.links.linkedin}</a></div>` : ''}
+          ${resumeContent.links?.github ? `<div class="contact-row"><strong>GitHub</strong><a href="${resumeContent.links.github}" target="_blank">${resumeContent.links.github}</a></div>` : ''}
         </div>
       </div>
 
@@ -314,11 +316,23 @@ export const creative1 = (data) => {
       </div>
       ` : ''}
 
+
       ${resumeContent.languages && resumeContent.languages.length > 0 ? `
       <div>
         <div class="section-title-side">Languages</div>
         <div class="contact-group" style="gap: 4px;">
           ${resumeContent.languages.map(l => `<div class="contact-row" style="font-weight:600;">• ${l}</div>`).join('')}
+        </div>
+      </div>
+      ` : ''}
+
+      ${resumeContent.certifications && resumeContent.certifications.length > 0 ? `
+      <div>
+        <div class="section-title-side">Certifications</div>
+        <div class="contact-group" style="gap: 4px;">
+          ${resumeContent.certification.map(c => `
+              <div class="contact-row" style="font-weight:600;">${c.issuer || ''} ${c.date ? `| ${c.date}` : ''}</div>
+          `).join('')}
         </div>
       </div>
       ` : ''}
@@ -368,6 +382,7 @@ export const creative1 = (data) => {
         </div>
       </div>
       ` : ''}
+
 
     </div>
 

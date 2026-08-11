@@ -5,8 +5,10 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node app.js",
-    "dev": "nodemon app.js"
+    "dev": "nodemon app.js",
+    "start": "node server.js",
+     "build": "./render-build.sh",
+      "postinstall": "npx puppeteer browsers install chrome"
   },
   "keywords": [],
   "author": "Bhavesh Yadav",
@@ -17,16 +19,20 @@
     "bcrypt": "^6.0.0",
     "cloudinary": "^1.41.3",
     "config": "^4.4.1",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
+    "express-rate-limit": "^8.5.2",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.4.1",
     "multer": "^2.1.1",
     "multer-storage-cloudinary": "^4.0.0",
     "openai": "^6.34.0",
     "pdfkit": "^0.18.0",
-    "puppeteer": "^24.42.0",
+    "puppeteer": "^25.5.0",
+    "rate-limit-redis": "^5.0.0",
+    "redis": "^6.1.0",
     "slugify": "^1.6.9"
   }
 }

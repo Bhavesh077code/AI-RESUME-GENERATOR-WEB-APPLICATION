@@ -1,39 +1,99 @@
 
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, RouterProvider, Navigate } from "react-router-dom";
 
 import Dashboard from "./pages/resumeAllPages/Dashboard";
 import TemplateList from "./pages/resumeAllPages/TemplateList";
-//import ResumeBuilder from "./pages/resumeAllPages/ResumeBuilder";
-import Register from "./pages/auth/RegisterUser";
-import Login from "./pages/auth/LoginUser";
-import Home from "./pages/dashboard/Home3";
-import AppDetail from "./about/AppDetail";
-import Feedback from "./Feedback/FeedBackl";
-//import Templates from "./pages/dashboard/Templates";
-//import English from "./pages/English";
-import UserProfile from "./pages/auth/UserProfile";
+import Register from "./pages/auth/RegisterUser1";
+import Login from "./pages/auth/LoginUser1";
+import Home from "./pages/dashboard/Home4";
+import UserRoutes from "./protectedRouter/ProtectedRoutes";
 
 import ResumeBuilder from "./pages/resumeAllPages/ResumeBuilder";
 import ResumeViewPage from "./pages/resumeAllPages/ResumeViewPage";
+import UserProfile from "./pages/auth/UserProfile";
+
+
+
 
 const router = createBrowserRouter([
-  { path: "/", element: <Home /> },
-  { path: "/dashboard", element: <Dashboard /> },
-  {/* Auth routes */},
-  { path: "/register", element: <Register /> },
-  { path: "/login", element: <Login /> },
-  { path: "/profile", element: <UserProfile /> },
- 
-    {/* Resume routes */},
-  { path: "/templates/:category", element: <TemplateList /> },
-  { path: "/resume-builder/:slug", element: <ResumeBuilder /> },
-   {path: "/resume-view/:category/:slug/:id",element: <ResumeViewPage />},
-  { path: "/about", element: <AppDetail /> },
-  { path: "/review", element: <Feedback /> },
-  //{ path: "/templates", element: <Templates /> },
-  //{ path: "/english", element: <English /> },
+  // =========================
+  // PUBLIC ROUTES
+  // =========================
 
-  
+  {
+    path: "/",
+    element: <Home />,
+  },
+
+  {
+    path: "/login",
+    element: <Login />,
+  },
+
+  {
+    path: "/register",
+    element: <Register />,
+  },
+
+  // =========================
+  // PROTECTED ROUTES
+  // =========================
+
+  {
+    path: "/dashboard",
+    element: (
+      <UserRoutes>
+        <Dashboard />
+      </UserRoutes>
+    ),
+  },
+
+  {
+    path: "/templates/:category",
+    element: (
+      <UserRoutes>
+        <TemplateList />
+      </UserRoutes>
+    ),
+  },
+
+  {
+    path: "/resume-builder/:slug",
+    element: (
+      <UserRoutes>
+        <ResumeBuilder />
+      </UserRoutes>
+    ),
+  },
+
+  {
+    path: "/user-profile",
+    element: (
+      <UserRoutes>
+        <UserProfile />
+      </UserRoutes>
+    ),
+  },
+
+  {
+    path: "/resume-view/:category/:slug/:id",
+    element: (
+      <UserRoutes>
+        <ResumeViewPage />
+      </UserRoutes>
+    ),
+  },
+
+ 
+
+  // =========================
+  // UNKNOWN URL
+  // =========================
+
+  {
+    path: "*",
+    element: <Navigate to="/login" replace />,
+  },
 ]);
 
 const App = () => {
@@ -41,3 +101,5 @@ const App = () => {
 };
 
 export default App;
+
+

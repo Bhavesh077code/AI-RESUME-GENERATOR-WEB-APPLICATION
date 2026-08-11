@@ -16,6 +16,7 @@ export const loginUser = async (req, res) => {
 
         const user = await User.findOne({ email }).select("+password")
 
+
         if (!user) {
             return res.status(400).json({
                 success: false,
@@ -31,8 +32,13 @@ export const loginUser = async (req, res) => {
             });
         }
 
-
+    
         const token = jwt.sign({ email: user.email, id: user._id }, process.env.JWT_SECRET, { expiresIn: "1d" })
+        res.cookie("token", token, {
+            httpOnly: true,
+            
+        })
+
 
         return res.status(200).json({
             success: true,

@@ -1,242 +1,292 @@
-
-
 export const professional4 = (data) => {
-  return `
+  const resumeContent = data.content || data;
+
+  return `
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&family=Lato:wght@300;400;700&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Inter:wght@300;400;500;600;700&display=swap');
 
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  
-  body {
-    background: #f0f2f5;
-    font-family: 'Lato', sans-serif;
-    color: #2d3436;
-  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #f0f2f5; font-family: 'Inter', sans-serif; color: #1a1a1a; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  
+  /* STRICT SINGLE PAGE A4 BOUNDARY */
+  .page {
+    width: 210mm;
+    height: 297mm;
+    max-height: 297mm;
+    background: #fff;
+    margin: 20px auto;
+    padding: 30px 40px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+  }
 
+  /* HEADER SECTION */
+  header { 
+    text-align: center; 
+    margin-bottom: 10px;
+    flex-shrink: 0;
+  }
+  header h1 { 
+    font-family: 'Cinzel', serif;
+    font-size: 26px; 
+    font-weight: 700; 
+    text-transform: uppercase; 
+    letter-spacing: 2px; 
+    color: #111;
+    margin-bottom: 4px;
+  }
+  
+  .contact-inline-bar { 
+    display: flex; 
+    justify-content: center; 
+    align-items: center;
+    gap: 14px; 
+    flex-wrap: wrap; 
+    list-style: none;
+    font-size: 11px;
+    color: #333;
+    font-weight: 500;
+  }
+  .contact-inline-bar li { display: flex; align-items: center; gap: 4px; }
+  .contact-inline-bar a { color: #111; text-decoration: underline; break-all: break-all; }
 
- 
-  .page {
-    width: 210mm;
-    min-height: 297mm;
-    background: #fff;
-    margin: 20px auto;
-    display: flex;
-    flex-direction: column;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.15);
-    position: relative;
-  }
+  /* COMPACT AUTO-SCALING FLOW CONTAINER */
+  .content-flow {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    flex-grow: 1;
+    overflow-y: auto;
+  }
+  .content-flow::-webkit-scrollbar { width: 0px; background: transparent; }
+  .content-flow { scrollbar-width: none; }
 
+  /* SECTION TITLE WITH RED UNDERLINE (As in Screenshot) */
+  .section-block { display: flex; flex-direction: column; width: 100%; }
+  
+  .section-title {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: #cf2e2e; /* Exact Red Accent Color from Image */
+    border-bottom: 1.5px solid #cf2e2e;
+    padding-bottom: 1px;
+    margin-bottom: 6px;
+    width: 100%;
+  }
 
+  /* DATA ROW METADATA */
+  .node-row-meta { display: flex; justify-content: space-between; align-items: baseline; font-size: 11.5px; margin-bottom: 1px; }
+  .node-title-bold { font-weight: 700; color: #111; }
+  .node-aside-right { font-weight: 600; color: #222; text-align: right; font-size: 11px; }
+  
+  .node-subtitle { font-size: 11px; color: #444; font-style: italic; margin-bottom: 3px; }
 
-  /* HEADER SECTION */
-  header {
-    background: #1a1a1a;
-    color: white;
-    padding: 50px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 8px solid #d4af37; /* Gold Accent */
-  }
+  /* COMPACT UNIFORM BULLETS */
+  .bullet-list { padding-left: 16px; display: flex; flex-direction: column; gap: 2.5px; list-style-type: disc; }
+  .bullet-list li { font-size: 11px; color: #222; line-height: 1.35; text-align: justify; }
 
-  .header-text h1 {
-    font-family: 'Montserrat', sans-serif;
-    font-size: 38px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    margin-bottom: 5px;
-  }
+  /* TECHNICAL SKILLS MATRIX STYLE */
+  .skills-matrix { display: flex; flex-direction: column; gap: 3px; font-size: 11px; }
+  .skills-row { display: flex; gap: 6px; }
+  .skills-label { font-weight: 700; color: #111; min-width: 130px; flex-shrink: 0; }
+  .skills-value { color: #333; }
 
-  .header-text p {
-    font-size: 16px;
-    color: #d4af37;
-    font-weight: 700;
-    letter-spacing: 4px;
-    text-transform: uppercase;
-  }
-
-  .profile-img {
-    width: 150px;
-    height: 150px;
-    border-radius: 50%;
-    border: 4px solid #fff;
-    object-fit: cover;
-    box-shadow: 0 10px 20px rgba(0,0,0,0.3);
-  }
-
-  /* MAIN CONTENT */
-  .container {
-    display: grid;
-    grid-template-columns: 1fr 2fr;
-    flex: 1;
-  }
-
-  /* LEFT COLUMN */
-  .sidebar {
-    background: #f8f9fa;
-    padding: 40px 30px;
-    border-right: 1px solid #eee;
-  }
-
-  .side-block { margin-bottom: 35px; }
-
-  .side-title {
-    font-family: 'Montserrat', sans-serif;
-    font-size: 14px;
-    font-weight: 800;
-    color: #1a1a1a;
-    text-transform: uppercase;
-    margin-bottom: 15px;
-    border-left: 4px solid #d4af37;
-    padding-left: 10px;
-  }
-
-  .contact-info p {
-    font-size: 13px;
-    margin-bottom: 8px;
-    display: flex;
-    align-items: center;
-    color: #636e72;
-  }
-
-  .skill-pill {
-    display: inline-block;
-    background: #1a1a1a;
-    color: #fff;
-    padding: 6px 12px;
-    border-radius: 2px;
-    font-size: 11px;
-    margin: 3px;
-    font-weight: 700;
-  }
-
-  /* RIGHT COLUMN */
-  .main-content {
-    padding: 40px;
-  }
-
-  .section-title {
-    font-family: 'Montserrat', sans-serif;
-    font-size: 20px;
-    font-weight: 800;
-    color: #1a1a1a;
-    margin-bottom: 20px;
-    display: flex;
-    align-items: center;
-  }
-
-  .section-title::after {
-    content: '';
-    height: 2px;
-    background: #d4af37;
-    flex: 1;
-    margin-left: 15px;
-  }
-
-  .summary {
-    font-size: 15px;
-    line-height: 1.8;
-    color: #2d3436;
-    margin-bottom: 30px;
-    font-style: italic;
-  }
-
-  .timeline-item {
-    margin-bottom: 25px;
-    position: relative;
-    padding-left: 20px;
-  }
-
-  .item-meta {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 5px;
-  }
-
-  .role { font-weight: 700; font-size: 16px; color: #1a1a1a; }
-  .duration { color: #d4af37; font-weight: 700; font-size: 12px; }
-  .company { font-weight: 400; color: #636e72; font-size: 14px; margin-bottom: 10px; }
-  .desc { font-size: 14px; line-height: 1.6; color: #2d3436; }
-
-  @media print {
-    body { background: none; }
-    .page { margin: 0; box-shadow: none; }
-  }
+  @media print { 
+    body { background: none; padding: 0; } 
+    .page { margin: 0; box-shadow: none; height: 297mm; max-height: 297mm; padding: 25px 35px; } 
+    .content-flow { overflow: hidden; }
+  }
 </style>
 </head>
-
 <body>
 
 <div class="page">
-  <header>
-    <div class="header-text">
-      <h1>${data.fullName || 'User Name'}</h1>
-      <p>Professional Developer</p>
-    </div>
-    <img src="${data.image}" class="profile-img" alt="Profile">
-  </header>
+  
+  <!-- HEADER -->
+  <header>
+    <h1>${resumeContent.fullName || 'SAKSHI LIMAYE'}</h1>
+    
+    <ul class="contact-inline-bar">
+      ${resumeContent.phone ? `<li>📞 ${resumeContent.phone}</li>` : ''}
+      ${resumeContent.email ? `<li>✉️ <a href="mailto:${resumeContent.email}">${resumeContent.email}</a></li>` : ''}
+      
+      ${resumeContent.links?.linkedin ? `
+        <li>🔗 <a href="${resumeContent.links.linkedin}" target="_blank">${resumeContent.links.linkedin}</a></li>
+      ` : ''}
+      
+      ${resumeContent.links?.github ? `
+        <li>💻 <a href="${resumeContent.links.github}" target="_blank">${resumeContent.links.github}</a></li>
+      ` : ''}
+      
+      ${resumeContent.links?.portfolio ? `
+        <li>🌐 <a href="${resumeContent.links.portfolio}" target="_blank">${resumeContent.links.portfolio}</a></li>
+      ` : ''}
+    </ul>
+  </header>
 
-  <div class="container">
-    <!-- SIDEBAR -->
-    <div class="sidebar">
-      <div class="side-block">
-        <div class="side-title">Contact</div>
-        <div class="contact-info">
-          <p>📍 ${data.location || 'Your City'}</p>
-          <p>📞 ${data.phone || 'Phone Number'}</p>
-          <p>📧 ${data.email || 'Email Address'}</p>
-        </div>
-      </div>
+  <!-- MAIN SCROLLABLE CONTENT FLOW -->
+  <div class="content-flow">
 
-      <div class="side-block">
-        <div class="side-title">Core Expertise</div>
-        <div class="skills">
-          ${data.skills?.map(s => `<span class="skill-pill">${s}</span>`).join('') || ''}
-        </div>
-      </div>
 
-      <div class="side-block">
-        <div class="side-title">Languages</div>
-        ${data.languages?.map(l => `<p style="font-size:13px; margin-bottom:5px;">• ${l}</p>`).join('') || ''}
-      </div>
-    </div>
+  
+  
+<!-- SUMMARY -->
+${resumeContent.summary ? `
+<div class="section-block">
+  <h2 class="section-title">Summary</h2>
 
-    <!-- MAIN -->
-    <div class="main-content">
-      <div class="section-title">About Me</div>
-      <div class="summary">${data.summary || 'Summary goes here...'}</div>
+  <div style="margin-bottom: 6px;">
+    <div class="node-row-meta">
+      <span style="font-size: inherit; font-weight: normal; line-height: inherit;">
+        ${resumeContent.summary}
+      </span>
+    </div>
+  </div>
+</div>
+` : ''}
 
-      <div class="section-title">Experience</div>
-      ${data.experience?.map(exp => `
-        <div class="timeline-item">
-          <div class="item-meta">
-            <span class="role">${exp.role}</span>
-            <span class="duration">${exp.startDate} - ${exp.current ? 'Present' : exp.endDate}</span>
-          </div>
-          <div class="company">${exp.company}</div>
-          <div class="desc">${exp.desc || ''}</div>
-        </div>
-      `).join('') || ''}
 
-      <div class="section-title">Education</div>
-      ${data.education?.map(ed => `
-        <div class="timeline-item">
-          <div class="item-meta">
-            <span class="role">${ed.degree}</span>
-            <span class="duration">${ed.year || ''}</span>
-          </div>
-          <div class="company">${ed.school}</div>
-        </div>
-      `).join('') || ''}
-    </div>
-  </div>
+
+    <!-- EDUCATION -->
+    ${resumeContent.education && resumeContent.education.length > 0 ? `
+    <div class="section-block">
+      <h2 class="section-title">Education</h2>
+      ${resumeContent.education.map(ed => `
+        <div style="margin-bottom: 4px;">
+          <div class="node-row-meta">
+            <span class="node-title-bold">${ed.school || ''}</span>
+            <span class="node-aside-right">${ed.year || ''}</span>
+          </div>
+          <div class="node-row-meta">
+            <span class="node-subtitle">${ed.degree || ''} ${ed.field ? `in ${ed.field}` : ''}</span>
+            ${ed.grade ? `<span class="node-aside-right" style="font-style:italic;">${ed.grade}</span>` : ''}
+          </div>
+        </div>
+      `).join('')}
+    </div>
+    ` : ''}
+
+    <!-- EXPERIENCE -->
+    ${resumeContent.experience && resumeContent.experience.length > 0 ? `
+    <div class="section-block">
+      <h2 class="section-title">Experience</h2>
+      ${resumeContent.experience.map(exp => `
+        <div style="margin-bottom: 6px;">
+          <div class="node-row-meta">
+            <span class="node-title-bold">${exp.company || ''} ${exp.projectContext ? `(${exp.projectContext})` : ''}</span>
+            <span class="node-aside-right">${exp.startDate || ''} – ${exp.current ? 'Present' : (exp.endDate || '')}</span>
+          </div>
+          ${exp.role ? `<div class="node-subtitle">${exp.role}</div>` : ''}
+          ${exp.desc ? `
+            <ul class="bullet-list">
+              <li>${exp.desc}</li>
+            </ul>
+          ` : ''}
+        </div>
+      `).join('')}
+    </div>
+    ` : ''}
+
+    <!-- PROJECTS -->
+    ${resumeContent.project && resumeContent.project.length > 0 ? `
+    <div class="section-block">
+      <h2 class="section-title">Projects</h2>
+      ${resumeContent.project.map(proj => `
+        <div style="margin-bottom: 6px;">
+          <div class="node-row-meta">
+            <span class="node-title-bold">
+              ${proj.title} ${proj.subtitle ? `: ${proj.subtitle}` : ''}
+            </span>
+            ${proj.link ? `<span class="node-aside-right"><a href="${proj.link}" target="_blank" style="color:#cf2e2e; text-decoration:underline;">Link</a></span>` : ''}
+          </div>
+          ${proj.desc ? `
+            <ul class="bullet-list">
+              <li>${proj.desc}</li>
+            </ul>
+          ` : ''}
+        </div>
+      `).join('')}
+    </div>
+    ` : ''}
+
+    <!-- RESEARCH AND PATENT / EXTRA PUBLICATIONS (Dynamic Optional Block) -->
+    ${resumeContent.publications && resumeContent.publications.length > 0 ? `
+    <div class="section-block">
+      <h2 class="section-title">Research and Patent</h2>
+      ${resumeContent.publications.map(pub => `
+        <div style="margin-bottom: 5px;">
+          <div class="node-row-meta">
+            <span class="node-title-bold">${pub.title}</span>
+            ${pub.link ? `<span class="node-aside-right"><a href="${pub.link}" target="_blank" style="color:#cf2e2e; text-decoration:underline;">Link</a></span>` : ''}
+          </div>
+          ${pub.desc ? `
+            <ul class="bullet-list">
+              <li>${pub.desc}</li>
+            </ul>
+          ` : ''}
+        </div>
+      `).join('')}
+    </div>
+    ` : ''}
+
+    <!-- TECHNICAL SKILLS -->
+    ${resumeContent.skills && resumeContent.skills.length > 0 ? `
+    <div class="section-block">
+      <h2 class="section-title">Technical Skills</h2>
+      <div class="skills-matrix">
+        ${Array.isArray(resumeContent.skills) ? `
+          <div class="skills-row">
+            <span class="skills-label">Skills & Frameworks:</span>
+            <span class="skills-value">${resumeContent.skills.join(', ')}</span>
+          </div>
+        ` : ''}
+      </div>
+    </div>
+    ` : ''}
+
+    <!-- LANGUAGES -->
+    ${resumeContent.languages && resumeContent.languages.length > 0 ? `
+    <div class="section-block">
+      <h2 class="section-title">Languages</h2>
+      <div class="skills-matrix">
+        ${Array.isArray(resumeContent.languages) ? `
+          <div class="skills-row">
+            <span class="skills-label">Languages:</span>
+            <span class="skills-value">${resumeContent.languages.join(', ')}</span>
+          </div>
+        ` : ''}
+      </div>
+    </div>
+    ` : ''}
+
+    <!-- CERTIFICATIONS -->
+    ${resumeContent.certification && resumeContent.certification.length > 0 ? `
+    <div class="section-block">
+      <h2 class="section-title">Certifications</h2>
+      <ul class="bullet-list">
+        ${resumeContent.certification.map(cert => `
+          <li>
+            <strong>${cert.name || ''}</strong> 
+            ${cert.issuer ? ` - ${cert.issuer}` : ''} 
+            ${cert.date ? ` (${cert.date})` : ''}
+          </li>
+        `).join('')}
+      </ul>
+    </div>
+    ` : ''}
+
+   
+  </div>
 </div>
 
 </body>
 </html>
-`;
-}; 
+  `;
+};

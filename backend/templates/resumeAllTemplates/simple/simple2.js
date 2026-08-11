@@ -7,393 +7,180 @@ export const simple2 = (data) => {
 <head>
 <meta charset="UTF-8">
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;800&family=Lato:wght@300;400;700&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700&display=swap');
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #f0f2f5; font-family: 'Outfit', sans-serif; color: #2d3748; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   
-  body {
-    background: #f0f2f5;
-    font-family: 'Lato', sans-serif;
-    color: #2b2b2b;
-  }
-
+  /* ABSOLUTE HEIGHT BOUNDARY FOR MAX CONTENT MANAGEMENT */
   .page {
     width: 210mm;
-    min-height: 297mm;
+    height: 297mm;
+    max-height: 297mm;
     background: #fff;
     margin: 20px auto;
+    padding: 35px 40px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.1);
     display: flex;
     flex-direction: column;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.15);
-    padding: 45px;
-  }
-
-  /* TOP HEADER ARCHITECTURE */
-  .header-grid {
-    display: grid;
-    grid-template-columns: 65% 35%;
-    align-items: center;
-    margin-bottom: 40px;
-  }
-
-  .name-block h1 {
-    font-family: 'Montserrat', sans-serif;
-    font-size: 42px;
-    font-weight: 800;
-    text-transform: uppercase;
-    color: #111111;
-    line-height: 1.1;
-  }
-
-  .name-block .title-badge {
-    display: inline-block;
-    background-color: #111111;
-    color: #ffffff;
-    font-size: 12px;
-    font-weight: 700;
-    text-transform: uppercase;
-    padding: 6px 16px;
-    margin-top: 10px;
-    letter-spacing: 2px;
-  }
-
-  .header-img-container {
-    display: flex;
-    justify-content: flex-end;
-  }
-
-  .square-profile-img {
-    width: 140px;
-    height: 140px;
-    object-fit: cover;
-    background-color: #e5e7eb;
-    border: 1px solid #d1d5db;
-  }
-
-  /* TWO COLUMN STRUCTURE */
-  .main-layout {
-    display: grid;
-    grid-template-columns: 32% 68%;
-    flex: 1;
-    gap: 40px;
-  }
-
-  /* LEFT SIDEBAR PANEL */
-  .left-panel {
-    display: flex;
-    flex-direction: column;
-    gap: 30px;
-  }
-
-  .block-title {
-    font-family: 'Montserrat', sans-serif;
-    font-size: 14px;
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    color: #111111;
-    margin-bottom: 15px;
-  }
-
-  .contact-list {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
-
-  .contact-row {
-    font-size: 12px;
-    color: #444444;
-    line-height: 1.4;
-  }
-
-  .contact-row strong {
-    display: block;
-    color: #111111;
-    text-transform: uppercase;
-    font-size: 11px;
-    margin-bottom: 2px;
-  }
-
-  .contact-row a {
-    color: #444444;
-    text-decoration: none;
-  }
-
-  .sidebar-summary {
-    font-size: 12.5px;
-    line-height: 1.6;
-    color: #555555;
-    text-align: justify;
-  }
-
-  .simple-list {
-    list-style: none;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-
-  .simple-list li {
-    font-size: 13px;
-    color: #444444;
-  }
-
-  /* LIGHT GREY BACKDROP CARD (AWARDS SECTION) */
-  .awards-card {
-    background-color: #EDF2F6;
-    padding: 20px 15px;
-    border-radius: 2px;
-    margin-top: 10px;
-  }
-
-  .award-node {
-    font-size: 12px;
-    color: #444444;
-    line-height: 1.4;
-  }
-  .award-node strong {
-    color: #111111;
-    display: block;
-  }
-
-  /* RIGHT PANEL MAIN CONTENT */
-  .right-panel {
-    display: flex;
-    flex-direction: column;
-    gap: 35px;
-  }
-
-  .right-section-title {
-    font-family: 'Montserrat', sans-serif;
-    font-size: 15px;
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    color: #111111;
-    border-bottom: 2px solid #e5e7eb;
-    padding-bottom: 5px;
-    margin-bottom: 20px;
-  }
-
-  /* TIMELINE VERTICAL LINK PATTERN */
-  .timeline-wrapper {
-    position: relative;
-    padding-left: 25px;
-    border-left: 2px solid #111111;
-    display: flex;
-    flex-direction: column;
-    gap: 25px;
-    margin-left: 8px;
-  }
-
-  .timeline-node {
+    overflow: hidden;
     position: relative;
   }
 
-  /* TIMELINE CIRCLE DOT */
-  .timeline-node::before {
-    content: '';
-    position: absolute;
-    left: -32px;
-    top: 4px;
-    width: 10px;
-    height: 10px;
-    background-color: #ffffff;
-    border: 2px solid #111111;
-    border-radius: 50%;
-  }
+  header { border-left: 4px solid #1a202c; padding-left: 15px; flex-shrink: 0; }
+  header h1 { font-size: 30px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #1a202c; }
+  header p { font-size: 13px; color: #4a5568; font-weight: 500; text-transform: uppercase; letter-spacing: 2px; margin-top: 1px; }
+  
+  .contact-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 12px; list-style: none; }
+  .contact-grid li { font-size: 12px; color: #4a5568; }
+  .contact-grid a { color: #4a5568; text-decoration: none; }
 
-  .timeline-grid {
-    display: grid;
-    grid-template-columns: 35% 65%;
-    gap: 15px;
-  }
-
-  .time-meta {
-    font-size: 12px;
-    color: #111111;
-  }
-  .time-meta .role-span {
-    font-weight: 700;
-    text-transform: uppercase;
-    display: block;
-    font-size: 13px;
-  }
-  .time-meta .date-span {
-    color: #777777;
-    display: block;
-    margin-top: 2px;
-  }
-
-  .content-meta {
-    font-size: 13px;
-    color: #555555;
-    line-height: 1.5;
-  }
-  .content-meta strong {
-    color: #111111;
-    font-size: 14px;
-    display: block;
-    margin-bottom: 4px;
-  }
-
-  /* LIGHT BLUE HIGHLIGHT CARD (EDUCATION BACKGROUND SECTION) */
-  .education-wrapper {
-    background-color: #EDF2F6;
-    padding: 20px;
+  /* OVERFLOW CONTAINMENT MODULE */
+  .inner-scroll-body {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 18px;
+    margin-top: 15px;
+    overflow-y: auto;
+    padding-right: 2px;
   }
+  .inner-scroll-body::-webkit-scrollbar { width: 0px; background: transparent; }
+  .inner-scroll-body { scrollbar-width: none; }
 
-  .edu-row {
-    display: grid;
-    grid-template-columns: 35% 65%;
-    gap: 15px;
-  }
+  .section-wrapper { display: flex; flex-direction: column; gap: 8px; }
+  .section-head-title { font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: #1a202c; border-bottom: 2px solid #e2e8f0; padding-bottom: 3px; }
+  
+  .paragraph-style { font-size: 12.5px; line-height: 1.5; color: #4a5568; text-align: justify; }
 
-  @media print {
-    body { background: none; padding: 0; }
-    .page { margin: 0; box-shadow: none; }
+  .data-node { display: flex; flex-direction: column; gap: 2px; margin-bottom: 4px; }
+  .data-node-split { display: flex; justify-content: space-between; align-items: baseline; font-size: 12.5px; }
+  .bold-title { font-weight: 700; color: #1a202c; font-size: 13.5px; }
+  .date-style { font-weight: 500; color: #718096; font-size: 11.5px; }
+
+  .pill-container { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 2px; }
+  .pill-skill { font-size: 11px; font-weight: 600; color: #1a202c; background: #edf2f7; padding: 3px 8px; border-radius: 4px; }
+
+  .bullet-structure { padding-left: 15px; display: flex; flex-direction: column; gap: 3px; }
+  .bullet-structure li { font-size: 12.5px; color: #4a5568; }
+
+  @media print { 
+    body { background: none; padding: 0; } 
+    .page { margin: 0; box-shadow: none; height: 297mm; max-height: 297mm; } 
+    .inner-scroll-body { overflow: hidden; }
   }
 </style>
 </head>
-
 <body>
 
 <div class="page">
-  
-  <header class="header-grid">
-    <div class="name-block">
-      <h1>${resumeContent.fullName || 'Name Surname'}</h1>
-      <div class="title-badge">${resumeContent.experience?.[0]?.role || 'Position Title Here'}</div>
-    </div>
-    <div class="header-img-container">
-      <img src="${resumeContent.image}" class="square-profile-img" alt="Profile">
-    </div>
-  </header>
-
-  <div class="main-layout">
+  <!-- DYNAMIC HEADER -->
+  ${resumeContent.fullName ? `
+  <header>
+    <h1>${resumeContent.fullName}</h1>
+    ${resumeContent.experience?.[0]?.role ? `<p>${resumeContent.experience[0].role}</p>` : ''}
     
-    <div class="left-panel">
-      
-      <div>
-        <div class="block-title">Contact</div>
-        <div class="contact-list">
-          ${resumeContent.phone ? `<div class="contact-row"><strong>Phone:</strong>${resumeContent.phone}</div>` : ''}
-          ${resumeContent.email ? `<div class="contact-row"><strong>Mail:</strong>${resumeContent.email}</div>` : ''}
-          ${resumeContent.links?.portfolio ? `<div class="contact-row"><strong>Github:</strong><a href="${resumeContent.links.portfolio}" target="_blank">${resumeContent.links.portfolio}</a></div>` : ''}
-          ${resumeContent.links?.linkedin ? `<div class="contact-row"><strong>Linkedin:</strong><a href="${resumeContent.links.linkedin}" target="_blank">${resumeContent.links.linkedin}</a></div>` : ''}
-          ${resumeContent.location ? `<div class="contact-row"><strong>Address:</strong>${resumeContent.location}</div>` : ''}
-        </div>
-      </div>
+    <ul class="contact-grid">
+      ${resumeContent.phone ? `<li>📞 ${resumeContent.phone}</li>` : ''}
+      ${resumeContent.email ? `<li>✉️ ${resumeContent.email}</li>` : ''}
+      ${resumeContent.location ? `<li>📍 ${resumeContent.location}</li>` : ''}
+      ${resumeContent.links?.portfolio ? `<li>🌐 <a href="${resumeContent.links.portfolio}" target="_blank">Portfolio</a></li>` : ''}
+      ${resumeContent.links?.linkedin ? `<li>🔗 <a href="${resumeContent.links.linkedin}" target="_blank">LinkedIn</a></li>` : ''}
+      ${resumeContent.links?.github ? `<li>💻 <a href="${resumeContent.links.github}" target="_blank">GitHub</a></li>` : ''}
+    </ul>
+  </header>
+  ` : ''}
 
-      ${resumeContent.summary ? `
-      <div>
-        <p class="sidebar-summary">${resumeContent.summary}</p>
-      </div>
-      ` : ''}
+  <!-- CORE FLOW DATA BAR -->
+  <div class="inner-scroll-body">
 
-      ${resumeContent.skills && resumeContent.skills.length > 0 ? `
-      <div>
-        <div class="block-title">Skills</div>
-        <ul class="simple-list" style="list-style-type: dashed; padding-left: 15px;">
-          ${resumeContent.skills.map(s => `<li>${s}</li>`).join('')}
-        </ul>
-      </div>
-      ` : ''}
-
-      ${resumeContent.languages && resumeContent.languages.length > 0 ? `
-      <div>
-        <div class="block-title">Languages</div>
-        <ul class="simple-list" style="list-style-type: square; padding-left: 15px;">
-          ${resumeContent.languages.map(l => `<li>${l}</li>`).join('')}
-        </ul>
-      </div>
-      ` : ''}
-
-      ${resumeContent.certification && resumeContent.certification.length > 0 ? `
-      <div>
-        <div class="block-title"></div>
-        <div class="awards-card">
-          ${resumeContent.certification.slice(0, 2).map(c => `
-            <div class="award-node" style="margin-bottom: 10px;">
-              <strong>${c.name || ''}</strong>
-              <span style="font-size: 11px; color:#666;">${c.issuer || ''} ${c.date ? `(${c.date})` : ''}</span>
-            </div>
-          `).join('')}
-        </div>
-      </div>
-      ` : ''}
-
+    <!-- ABOUT -->
+    ${resumeContent.summary ? `
+    <div class="section-wrapper">
+      <h2 class="section-head-title">Profile Summary</h2>
+      <p class="paragraph-style">${resumeContent.summary}</p>
     </div>
+    ` : ''}
 
-    <div class="right-panel">
-      
-      ${resumeContent.experience && resumeContent.experience.length > 0 ? `
-      <div>
-        <div class="right-section-title">Job & Experience</div>
-        <div class="timeline-wrapper">
-          ${resumeContent.experience.map(exp => `
-            <div class="timeline-node">
-              <div class="timeline-grid">
-                <div class="time-meta">
-                  <span class="role-span">${exp.role || ''}</span>
-                  <span class="date-span">${exp.startDate || ''} - ${exp.current ? 'Present' : (exp.endDate || '')}</span>
-                </div>
-                <div class="content-meta">
-                  <strong>${exp.company || ''}</strong>
-                  ${exp.desc ? `<p>${exp.desc}</p>` : ''}
-                </div>
-              </div>
-            </div>
-          `).join('')}
+    <!-- EXPERIENCE -->
+    ${resumeContent.experience && resumeContent.experience.length > 0 ? `
+    <div class="section-wrapper">
+      <h2 class="section-head-title">Professional Experience</h2>
+      ${resumeContent.experience.map(exp => exp.company || exp.role ? `
+        <div class="data-node">
+          <div class="data-node-split">
+            <span class="bold-title">${exp.company || ''}</span>
+            ${exp.startDate ? `<span class="date-style">${exp.startDate} - ${exp.current ? 'PRESENT' : (exp.endDate || '')}</span>` : ''}
+          </div>
+          ${exp.role ? `<div class="paragraph-style" style="font-weight:500; font-style: italic;">${exp.role}</div>` : ''}
+          ${exp.desc ? `<p class="paragraph-style">${exp.desc}</p>` : ''}
         </div>
-      </div>
-      ` : ''}
-
-      ${resumeContent.project && resumeContent.project.length > 0 ? `
-      <div>
-        <div class="right-section-title">Key Projects</div>
-        <div class="timeline-wrapper" style="border-left: 2px dashed #d1d5db;">
-          ${resumeContent.project.map(proj => `
-            <div class="timeline-node" style="margin-bottom: 5px;">
-              <div class="timeline-grid">
-                <div class="time-meta">
-                  <span class="role-span" style="color: #111;">${proj.title || ''}</span>
-                  ${proj.link ? `<span class="date-span"><a href="${proj.link}" target="_blank" style="color:#2563eb; text-decoration:none;">Link</a></span>` : ''}
-                </div>
-                <div class="content-meta">
-                  ${proj.desc ? `<p>${proj.desc}</p>` : ''}
-                </div>
-              </div>
-            </div>
-          `).join('')}
-        </div>
-      </div>
-      ` : ''}
-
-      ${resumeContent.education && resumeContent.education.length > 0 ? `
-      <div>
-        <div class="right-section-title">Education Background</div>
-        <div class="education-wrapper">
-          ${resumeContent.education.map(ed => `
-            <div class="edu-row">
-              <div class="time-meta">
-                <span class="role-span" style="font-size:12px;">${ed.year || ''}</span>
-              </div>
-              <div class="content-meta">
-                <strong>${ed.degree || ''} ${ed.field ? `(${ed.field})` : ''}</strong>
-                <p>${ed.school || ''}</p>
-              </div>
-            </div>
-          `).join('')}
-        </div>
-      </div>
-      ` : ''}
-
+      ` : '').join('')}
     </div>
+    ` : ''}
+
+    <!-- PROJECTS -->
+    ${resumeContent.project && resumeContent.project.length > 0 ? `
+    <div class="section-wrapper">
+      <h2 class="section-head-title">Key Projects</h2>
+      ${resumeContent.project.map(proj => proj.title ? `
+        <div class="data-node">
+          <div class="data-node-split">
+            <span class="bold-title">${proj.title}</span>
+            ${proj.link ? `<span class="date-style"><a href="${proj.link}" target="_blank" style="color:#2b6cb0; text-decoration:none;">View Project</a></span>` : ''}
+          </div>
+          ${proj.desc ? `<p class="paragraph-style">${proj.desc}</p>` : ''}
+        </div>
+      ` : '').join('')}
+    </div>
+    ` : ''}
+
+    <!-- EDUCATION -->
+    ${resumeContent.education && resumeContent.education.length > 0 ? `
+    <div class="section-wrapper">
+      <h2 class="section-head-title">Education</h2>
+      ${resumeContent.education.map(ed => ed.school || ed.degree ? `
+        <div class="data-node">
+          <div class="data-node-split">
+            <span class="bold-title">${ed.school || ''}</span>
+            ${ed.year ? `<span class="date-style">${ed.year}</span>` : ''}
+          </div>
+          ${ed.degree || ed.field ? `<div class="paragraph-style">${ed.degree || ''} ${ed.field ? `(${ed.field})` : ''}</div>` : ''}
+        </div>
+      ` : '').join('')}
+    </div>
+    ` : ''}
+
+    <!-- CERTIFICATIONS -->
+    ${resumeContent.certification && resumeContent.certification.length > 0 ? `
+    <div class="section-wrapper">
+      <h2 class="section-head-title">Certifications</h2>
+      <ul class="bullet-structure" style="list-style-type: circle;">
+        ${resumeContent.certification.map(cert => cert.name ? `
+          <li><strong>${cert.name}</strong> ${cert.issuer ? `| ${cert.issuer}` : ''} ${cert.date ? `(${cert.date})` : ''}</li>
+        ` : '').join('')}
+      </ul>
+    </div>
+    ` : ''}
+
+    <!-- SKILLS -->
+    ${resumeContent.skills && resumeContent.skills.length > 0 ? `
+    <div class="section-wrapper">
+      <h2 class="section-head-title">Core Competencies</h2>
+      <div class="pill-container">
+        ${resumeContent.skills.map(s => s ? `<span class="pill-skill">${s}</span>` : '').join('')}
+      </div>
+    </div>
+    ` : ''}
+
+    <!--languages-->
+    ${resumeContent.languages && resumeContent.languages.length > 0 ? `
+    <div class="section-wrapper">
+      <h2 class="section-head-title">Languages</h2>
+      <div class="pill-container">
+        ${resumeContent.languages.map(l => l ? `<span class="pill-skill">${l}</span>` : '').join('')}
+      </div>
+    </div>
+    ` : ''}
 
   </div>
 </div>

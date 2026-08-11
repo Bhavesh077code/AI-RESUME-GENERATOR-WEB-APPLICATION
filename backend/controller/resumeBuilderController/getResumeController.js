@@ -1,29 +1,14 @@
-/*
-import { Resume } from '../../module/resumeallmodule/resumeModel.js';
-
-export const getResume = async (req, res) => {
-        try {
-            const resumes = await Resume.find();
-
-            if (!resumes) {
-                return res.status(404).json({ message: 'No resumes found' });
-            }
-            
-            res.status(200).json({
-                success: true,
-                message: 'Resumes fetched successfully',
-                resumes
-            })
-        } catch (error) {
-            console.error(error);
-            res.status(500).json({ message: 'Error fetching resumes' });
-        }
-    };
-    */
+// This controller is used to fetch all resumes belonging to the currently logged-in user.
+//  First, the Resume model is imported to access resume data from the database, while mongoose is imported for MongoDB-related operations.
+//  The controller gets the authenticated user's ID from req.user.id and uses it to search the Resume collection, ensuring that only resumes created by the logged-in user are retrieved.
+//  The find() method returns all matching resumes, and sort({ createdAt: -1 }) sorts them by creation date in descending order so that the newest resume appears first.
+//  After successfully retrieving the resumes, the controller returns a 200 success response containing a success status, the total number of resumes using resumes.
+// length, and the complete resumes data. If any error occurs while fetching the resumes from the database, the catch block handles the error and returns a 500 server error response with an appropriate error message.
+//  The main purpose of this API is to provide the logged-in user with a list of all their saved resumes, with the most recently created resume displayed first, so the frontend can show and manage the user's resume collection.
 
 
-  
-import { Resume } from "../../module/resumeallmodule/resumeModel.js"
+
+import { Resume } from "../../module/resumeAllModule/resumeModel.js"
 import mongoose from "mongoose"
 
  export const getUserResumes = async (req, res) => {

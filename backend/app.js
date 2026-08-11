@@ -1,39 +1,71 @@
+import express from "express";
+import cors from "cors";
+import path from "path";
 
-import express from 'express';
-import { connectDB } from './config/db.js';
-import userRoutes from './routes/userRoutes.js';
-import resumeRoutes from './routes/resumeAllRoutes/resumeRoutes.js';
-import templateRoutes from './routes/resumeAllRoutes/templateRoutes.js';
-import path from 'path';
-import cors from 'cors';
-
-
-import dns from 'dns';
-dns.setServers(['1.2.1.2', '2.3.2.3', '0.0.0.0', '8.8.8.8', '8.8.4.4', '1.1.1.1']);
-
+import userRoutes from "./routes/userRoutes.js";
+import resumeRoutes from "./routes/resumeAllRoutes/resumeRoutes.js";
+import templateRoutes from "./routes/resumeAllRoutes/templateRoutes.js";
+import feedBackRoutes from "./routes/resumeAllRoutes/feedBackRoutes.js";
 
 const app = express();
-app.use(cors({
-  origin: ["http://192.168.1.92:5173", "http://localhost:5173"], // Adjust this to your frontend URL
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-}));
-app.use(express.json());
 
-// expose uploads folder publicly
+// =======================
+// Middleware
+// =======================
+app.use(
+  cors({
+    origin: [/\.vercel\.app$/],
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  }),
+);
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// =======================
+// Static Files
+// =======================
 app.use("/uploads", express.static(path.resolve("uploads")));
 
+// =======================
+// Routes
+// =======================
+app.use("/user", userRoutes);
+app.use("/resume", resumeRoutes);
+app.use("/create", templateRoutes);
+app.use("/feedback", feedBackRoutes);
 
-
-app.use('/resume', resumeRoutes);
-app.use('/user', userRoutes);
-app.use('/create', templateRoutes);
-
-
-connectDB();
-
-
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+// =======================
+// Health Check
+// =======================
+app.get("/", (req, res) => {
+  res.json({
+    success: true,
+    message: "Resume API is running 🚀",
+  });
 });
+
+// =======================
+// 404 Handler
+// =======================
+app.use((req, res) => {
+  res.status(404).json({
+    success: false,
+    message: "Route not found",
+  });
+});
+
+// =======================
+// Global Error Handler
+// =======================
+app.use((err, req, res, next) => {
+  console.error(err);
+
+  res.status(err.status || 500).json({
+    success: false,
+    message: err.message || "Internal Server Error",
+  });
+});
+
+export default app;

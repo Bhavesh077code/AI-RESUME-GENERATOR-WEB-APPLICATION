@@ -1,398 +1,508 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { MdEditDocument, MdArrowBack, MdVisibility, MdVisibilityOff, MdContentCopy, MdCheck } from "react-icons/md";
+import {
+  MdEditDocument,
+  MdArrowBack,
+  MdContentCopy,
+  MdCheck,
+  MdStar,
+  MdStarBorder,
+  MdSend,
+} from "react-icons/md";
 import { BsCloudDownloadFill } from "react-icons/bs";
 import { IoSettingsOutline } from "react-icons/io5";
+import {
+  FiUser,
+  FiCalendar,
+  FiFileText,
+  FiThumbsUp,
+  FiThumbsDown,
+} from "react-icons/fi";
+import { Sparkles, Loader2, AlertCircle } from "lucide-react";
 import BASE_URL from "../../api";
 import DashbordNavbar from "../../components/navbar/DashbordNavbar";
+import { toast } from "react-toastify";
 
 function ResumeViewPage() {
-    // urlCategory aur templateSlug ko fallback ke liye rakha hai
-    const { category: urlCategory, templateSlug, slug: urlSlug, id } = useParams();
-    const navigate = useNavigate();
+  const {
+    category: urlCategory,
+    templateSlug,
+    slug: urlSlug,
+    id,
+  } = useParams();
+  const navigate = useNavigate();
 
-    const [htmlPreview, setHtmlPreview] = useState("");
-    const [loading, setLoading] = useState(true);
-    const [isPublic, setIsPublic] = useState(false);
-    const [publicSlug, setPublicSlug] = useState(null);
-    const [dbTemplateSlug, setDbTemplateSlug] = useState(""); // ✅ Server se sahi slug save karne ke liye state
-    const [dbCategory, setDbCategory] = useState("");         // ✅ Server se sahi category save karne ke liye state
-    const [copied, setCopied] = useState(false);
-    const [pdfUrl, setPdfUrl] = useState("");
+  // State variables
+  const [htmlPreview, setHtmlPreview] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [pdfUrl, setPdfUrl] = useState("");
+  const [resumeTitle, setResumeTitle] = useState("");
+  const [ownerName, setOwnerName] = useState("");
+  const [createdAt, setCreatedAt] = useState("");
 
-    // Dynamic category detection helper
-    const getCategoryBySlug = (tSlug) => {
-        if (!tSlug) return "professional";
-        const lowerSlug = tSlug.toLowerCase();
-        if (lowerSlug.startsWith("tech")) return "tech";
-        if (lowerSlug.startsWith("simple")) return "simple";
-        if (lowerSlug.startsWith("creative")) return "creative";
-        return "professional";
-    };
+  // Feedback states
+  const [rating, setRating] = useState(0);
+  const [hoverRating, setHoverRating] = useState(0);
+  const [feedbackText, setFeedbackText] = useState("");
+  const [feedbackEmoji, setFeedbackEmoji] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
 
-    // 🚀 STEP 1: LOAD REAL RESUME DATA FROM BACKEND DATABASE
-    useEffect(() => {
-        const fetchSavedResumeHTML = async () => {
-            if (!id) return;
-            try {
-                const token = localStorage.getItem("token");
+  const getCategoryBySlug = (tSlug) => {
+    if (!tSlug) return "professional";
+    const lowerSlug = tSlug.toLowerCase();
+    if (lowerSlug.startsWith("tech")) return "tech";
+    if (lowerSlug.startsWith("simple")) return "simple";
+    if (lowerSlug.startsWith("creative")) return "creative";
+    return "professional";
+  };
 
-                const res = await fetch(`${BASE_URL}/resume/resume/${id}`, {
-                    method: "GET",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
+  // ============================================================
+  // 1. LOAD RESUME DATA
+  // ============================================================
+  useEffect(() => {
+    const fetchSavedResumeHTML = async () => {
+      if (!id) return;
+      try {
+        const token = localStorage.getItem("token");
 
-                if (!res.ok) {
-                    console.error(`Backend Response Error! Status: ${res.status}`);
-                    setLoading(false);
-                    return;
-                }
+        const res = await fetch(`${BASE_URL}/resume/resume/${id}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
-                const result = await res.json();
+        if (!res.ok) {
+          console.error(`Backend Error! Status: ${res.status}`);
+          setLoading(false);
+          return;
+        }
 
-                if (result.success && result.data) {
-                    const resumeData = result.data;
+        const result = await res.json();
 
-                    // Database ke andar real template slug jo saved hai use priority di
-                    const finalSlug = resumeData.templateSlug || urlSlug || templateSlug || "simple";
-                    const detectedCategory = urlCategory || getCategoryBySlug(finalSlug);
+        if (result.success && result.data) {
+          const resumeData = result.data;
 
-                    // PDF URL save karo
-                    setPdfUrl(resumeData.pdfUrl || "");
+          setResumeTitle(resumeData.title || "My Resume");
+          setOwnerName(resumeData.content?.fullName || "User");
+          setCreatedAt(resumeData.createdAt || new Date().toISOString());
 
-                    setIsPublic(resumeData.isPublic || false);
-                    setPublicSlug(resumeData.publicSlug || null);
-                    setDbTemplateSlug(finalSlug); // ✅ State update for global usage
-                    setDbCategory(detectedCategory); // ✅ State update for global usage
+          const finalSlug =
+            resumeData.templateSlug || urlSlug || templateSlug || "simple";
+          const detectedCategory = urlCategory || getCategoryBySlug(finalSlug);
 
-                    // 🚀 STEP 2: GENERATE REAL HTML PREVIEW FROM DATABASE CONTENT
-                    const previewRes = await fetch(`${BASE_URL}/create/preview`, {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({
-                            category: detectedCategory,
-                            slug: finalSlug,
-                            data: {
-                                ...resumeData.content,
-                                image: resumeData.image || ""
-                            }
-                        }),
-                    });
+          setPdfUrl(resumeData.pdfUrl || "");
 
-                    const previewResult = await previewRes.json();
-                    if (previewRes.ok && previewResult.success) {
-                        const rawHtml = previewResult.html;
+          const previewRes = await fetch(`${BASE_URL}/create/preview`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              category: detectedCategory,
+              slug: finalSlug,
+              data: {
+                ...resumeData.content,
+                image: resumeData.image || "",
+              },
+            }),
+          });
 
-                        {/* 🛠️ INJECTING CSS: Mouse Scroll Allow Rakha Hai Par Scrollbar Lines Ko Hide Kar Diya Hai */ }
-                        const cleanHtml = rawHtml.includes("</head>")
-                            ? rawHtml.replace("</head>", `<style>
-                                ::-webkit-scrollbar { display: none !important; } 
-                                html, body { 
-                                    margin: 0 !important; 
-                                    padding: 0 !important; 
-                                    overflow-y: auto !important;
-                                    overflow-x: hidden !important;
-                                    scrollbar-width: none;
-                                    -ms-overflow-style: none;
-                                    background: white !important;
-                                }
-                             </style></head>`)
-                            : `<style>
-                                ::-webkit-scrollbar { display: none !important; } 
-                                html, body { overflow-y: auto !important; overflow-x: hidden !important; scrollbar-width: none; }
-                             </style>${rawHtml}`;
+          const previewResult = await previewRes.json();
+          if (previewRes.ok && previewResult.success) {
+            const rawHtml = previewResult.html;
 
-                        setHtmlPreview(cleanHtml);
+            const cleanHtml = rawHtml.includes("</head>")
+              ? rawHtml.replace(
+                  "</head>",
+                  `<style>
+                    ::-webkit-scrollbar { display: none !important; } 
+                    html, body { 
+                      margin: 0 !important; 
+                      padding: 0 !important; 
+                      overflow-y: auto !important;
+                      overflow-x: hidden !important;
+                      scrollbar-width: none;
+                      -ms-overflow-style: none;
+                      background: white !important;
                     }
-                }
+                  </style></head>`,
+                )
+              : `<style>
+                  ::-webkit-scrollbar { display: none !important; } 
+                  html, body { overflow-y: auto !important; overflow-x: hidden !important; scrollbar-width: none; }
+                </style>${rawHtml}`;
 
-            } catch (error) {
-                console.error("Error loading resume page structure:", error);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchSavedResumeHTML();
-    }, [id, urlSlug, templateSlug, urlCategory]);
-
-
-    // 🚀 STEP 3: TOGGLE PRIVACY (PUBLISH / PRIVATE CONTROLLER)
-    const handlePrivacyToggle = async () => {
-        try {
-            const token = localStorage.getItem("token");
-
-            const targetEndpoint = isPublic
-                ? `${BASE_URL}/resume/private/${id}`
-                : `${BASE_URL}/resume/public/${id}`;
-
-            const res = await fetch(targetEndpoint, {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`
-                }
-            });
-
-            const result = await res.json();
-
-            if (res.ok && result.success) {
-                setIsPublic(result.data.isPublic);
-                setPublicSlug(result.data.publicSlug);
-            } else {
-                alert(result.message || "Privacy state update failed.");
-            }
-        } catch (err) {
-            console.error("Status toggle operations failed:", err);
+            setHtmlPreview(cleanHtml);
+          }
         }
+      } catch (error) {
+        console.error("Error loading resume:", error);
+      } finally {
+        setLoading(false);
+      }
     };
 
-    // 🚀 STEP 4: LINK COPY ENGINE (FIXED: Route mapping with live client domain standard)
-    const copyShareLink = () => {
-        if (!publicSlug) return;
-        // Agar aapke frontend router mein router path "/share/:slug" hai to "/share/" rakhein, agar "/share/r/:slug" hai to niche badal sakte hain
-        const shareUrl = `${window.location.origin}/${publicSlug}`;
-        navigator.clipboard.writeText(shareUrl);
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
-    };
+    fetchSavedResumeHTML();
+  }, [id, urlSlug, templateSlug, urlCategory]);
 
-    // 🚀 STEP 5: REAL BINARY PDF DOWNLOAD PIPELINE
-    const handleDownload = async () => {
-        try {
-            const token = localStorage.getItem("token");
+  // ============================================================
+  // 2. COPY PDF LINK
+  // ============================================================
+  const copyPdfLink = async () => {
+    try {
+      await navigator.clipboard.writeText(pdfUrl);
+      toast.success("PDF link copied!");
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to copy link");
+    }
+  };
 
-            const res = await fetch(`${BASE_URL}/resume/download/${id}`, {
-                method: "GET",
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
+  // ============================================================
+  // 3. OPEN PDF IN BROWSER
+  // ============================================================
+  const openPdfInBrowser = () => {
+    window.open(pdfUrl, "_blank", "noopener,noreferrer");
+  };
 
-            if (!res.ok) throw new Error("PDF generation failed on backend");
-
-            const blob = await res.blob();
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement("a");
-            a.href = url;
-            a.download = `${publicSlug || "resume"}.pdf`;
-            document.body.appendChild(a);
-            a.click();
-
-            document.body.removeChild(a);
-            window.URL.revokeObjectURL(url);
-        } catch (error) {
-            console.error("Download Error:", error);
-            alert("PDF download karne me kuch dikkat aayi!");
-        }
-    };
-
-    // 🚀 STEP 6: MODIFY REDIRECT LOGIC (FIXED: Mapped directly with authenticated states)
-    const handleEditRedirect = () => {
-        // const activeCategory = dbCategory || urlCategory || "professional";
-        // const activeSlug = dbTemplateSlug || urlSlug || "simple";
-
-        if (!id) {
-            alert("Resume ID nahi mili!");
-            return;
-        }
-
-        // Sahi template context route target logic
-        navigate(`/resume-builder/${urlCategory}/${urlSlug}/${id}`);
-    };
-
-    if (loading) {
-        return (
-            <div className="h-screen w-full flex items-center justify-center bg-slate-50">
-                <div className="flex flex-col items-center gap-3">
-                    <div className="w-10 h-10 border-4 border-black border-t-transparent rounded-full animate-spin"></div>
-                    <div className="text-slate-500 text-sm font-medium tracking-wide">Syncing Workspace Structure...</div>
-                </div>
-            </div>
-        );
+  // ============================================================
+  // 4. SUBMIT FEEDBACK
+  // ============================================================
+  const handleSubmitFeedback = async () => {
+    if (rating === 0) {
+      toast.warning("Please give a rating!");
+      return;
     }
 
+    setIsSubmitting(true);
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch(`${BASE_URL}/feedback/submit`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          resumeId: id,
+          rating,
+          feedback: feedbackText,
+          emoji: feedbackEmoji,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok && data.success) {
+        setFeedbackSubmitted(true);
+        toast.success("Thank you for your feedback! 🙏");
+      } else {
+        toast.error(data.message || "Failed to submit feedback");
+      }
+    } catch (error) {
+      console.error("Feedback error:", error);
+      toast.error("Failed to submit feedback");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // ============================================================
+  // 5. EMOJI OPTIONS
+  // ============================================================
+  const emojiOptions = [
+    { emoji: "😍", label: "Love it" },
+    { emoji: "😊", label: "Good" },
+    { emoji: "😐", label: "Okay" },
+    { emoji: "😕", label: "Not good" },
+    { emoji: "😡", label: "Bad" },
+  ];
+
+  // Loading state
+  if (loading) {
     return (
-        <div className="h-screen w-full flex flex-col bg-[#f1f3f5] overflow-hidden">
-
-            {/* Top Bar Full Width Navbar */}
-            <div className="w-full  flex-shrink-0 z-30 shadow-sm">
-
-            </div>
-
-            {/* Centered Canvas Container Area */}
-            <div className="flex-1 w-full overflow-hidden p-8 lg:p-8 pt-8 pb-8 mb-8 flex justify-center items-center">
-
-                {/* Main Dynamic Flexible Layout */}
-                 <div className="flex flex-col lg:flex-row items-stretch justify-center gap-6 max-w-4xl w-full h-[calc(100vh-50px)]">
-
-                    {/* 📄 LEFT CANVAS: Full size with Mouse Scroll active, seamless background */}
-                    <div className="flex-1 overflow-y-auto h-full w-full border-none bg-transparent"
-                        style={{
-                            scrollbarWidth: "none",
-                            msOverflowStyle: "none"
-                        }}
-                    >
-                        <style>{`
-                            .flex-1::-webkit-scrollbar { display: none; }
-                        `}</style>
-
-                        {htmlPreview ? (
-                            <div className="w-full flex justify-center" >
-                            <iframe
-                                srcDoc={htmlPreview}
-                                //className="w-full h-full border-none block m-0 p-0 rounded-xl shadow-lg"
-                                // className="w-full h-[calc(100vh-100px)] border-none"
-                                className="w-[800px] h-[calc(100vh-100px)] border-none rounded-xl shadow-lg"
-                                style={{
-                                    minHeight: "297mm",
-                                    minWidth: "275mm",
-                                    background: "white"
-                                }}
-                                sandbox="allow-scripts"
-                                title="Final Resume Preview"
-                            />
-                            </div>
-                        ) : (
-                            <div className="w-full h-full flex items-center justify-center text-slate-400 text-sm">
-                                Preview load nahi ho paya, kripya data check karein.
-                            </div>
-                        )}
-                    </div>
-                    </div>
-
-                    {/* RIGHT CONTAINER: Control Settings Panel */}
-                    <div className="w-full lg:w-[280px] bg-white border border-slate-200/60 rounded-2xl p-4  flex flex-col justify-between flex-shrink-0 shadow-lg shadow-slate-300/20 self-start mt-6 h-auto">
-
-                        <div className="w-full flex flex-col gap-4">
-
-                            <div className="flex items-center gap-2 text-slate-400 font-bold tracking-wider text-[10px] uppercase pb-1 border-b border-slate-100">
-                                <IoSettingsOutline className="text-sm" /> Document Controls
-                            </div>
-
-                            {/* Status Info Block */}
-                            <div className="flex items-center justify-between bg-slate-50 p-2.5 rounded-xl border border-slate-200/40">
-                                <span className="text-[11px] font-semibold text-slate-600">Privacy Mode:</span>
-                                <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${isPublic ? "bg-emerald-50 text-emerald-600 border border-emerald-200" : "bg-amber-50 text-amber-600 border border-amber-200"}`}>
-                                    {isPublic ? "Public" : "Private"}
-                                </span>
-                            </div>
-
-                            {/* 1. PUBLIC / PRIVATE TOGGLE BUTTON */}
-                            <button
-                                onClick={handlePrivacyToggle}
-                                className={`w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-xs font-semibold transition-all border ${isPublic
-                                    ? "bg-white hover:bg-slate-100 text-slate-700 border-slate-200"
-                                    : "bg-black hover:bg-slate-800 text-white border-transparent"
-                                    }`}
-                            >
-                                {isPublic ? (
-                                    <>
-                                        <MdVisibilityOff className="text-base" /> Make Private
-                                    </>
-                                ) : (
-                                    <>
-                                        <MdVisibility className="text-base" /> Make Public
-                                    </>
-                                )}
-                            </button>
-
-                            {/* 🔗 LIVE DYNAMIC SHARING SUB-CARD */}
-                            {isPublic && publicSlug && (
-                                <div className="w-full p-2 bg-emerald-50/40 border border-emerald-100 rounded-xl flex items-center justify-between gap-2 mt-1 animate-fadeIn">
-                                    <span className="text-[10px] font-medium text-emerald-800 truncate px-1">
-                                        {publicSlug}
-                                    </span>
-                                    <button
-                                        onClick={copyShareLink}
-                                        className="p-1.5 bg-white text-slate-700 border border-slate-200/60 rounded-lg hover:bg-slate-50 transition-colors flex-shrink-0"
-                                        title="Copy Sharing Link"
-                                    >
-                                        {copied ? <MdCheck className="text-emerald-600" /> : <MdContentCopy />}
-                                    </button>
-                                </div>
-                            )}
-
-                            {/* 2. DOWNLOAD BUTTON */}
-                            <button
-                                onClick={handleDownload}
-                                className="w-full flex items-center justify-center gap-2 px-5 py-2.5 bg-black hover:bg-slate-800 text-white rounded-xl font-medium text-xs transition-all shadow-sm"
-                            >
-                                <BsCloudDownloadFill className="text-base" /> Download PDF
-                            </button>
-
-                            {/* 3. EDIT ACTION */}
-                            <button
-                                onClick={handleEditRedirect}
-                                className="w-full flex items-center justify-center gap-2 px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl font-medium text-xs transition-all"
-                            >
-                                <MdEditDocument className="text-base text-slate-500" /> Modify Resume
-                            </button>
-                        </div>
-
-                        {/* 4. DASHBOARD LINK AT FOOTER */}
-                        <div className="pt-3 border-t border-slate-100 mt-4">
-                            <button
-                                onClick={() => navigate("/dashboard")}
-                                className="w-full flex items-center justify-center gap-2 py-2 px-4 bg-slate-50 hover:bg-slate-100 text-slate-600 font-semibold text-[11px] rounded-xl transition-all border border-slate-200/40"
-                            >
-                                <MdArrowBack className="text-xs" /> Dashboard
-                            </button>
-                        </div>
-
-
-                        <div className="flex-1 mt-6 h-full border-none bg-transparent overflow-y-auto">
-                            {pdfUrl && (
-                                <div className="w-full p-3 bg-slate-50 border rounded-xl">
-                                    <p className="text-xs font-medium mb-2">PDF URL</p>
-
-                                    <a
-                                        href={pdfUrl}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="text-blue-600 text-xs break-all underline"
-                                    >
-                                        {pdfUrl}
-                                    </a>
-
-                                    <button
-                                        onClick={() => navigator.clipboard.writeText(pdfUrl)}
-                                        className="mt-2 w-full py-2 bg-black hover:bg-slate-800 text-center font-semibold transition-colors text-white rounded-lg text-xs"
-                                    >
-                                        Copy PDF Link
-                                    </button>
-                                </div>
-                            )}
-                        </div>
-
-
-
-                        {/* 🔗 LIVE DYNAMIC SHARING SUB-CARD */}
-                        {  pdfUrl && (
-                            <div className="w-full p-2 bg-emerald-50/40 border border-emerald-100 rounded-xl flex items-center justify-between gap-2 mt-1 animate-fadeIn">
-                                <span className="text-[10px] font-medium text-emerald-800 truncate px-1">
-                                    {pdfUrl}
-                                </span>
-                                <button
-                                    onClick={pdfUrl && copyShareLink}
-                                    className="p-1.5 bg-white text-slate-700 border border-slate-200/60 rounded-lg hover:bg-slate-50 transition-colors flex-shrink-0"
-                                    title="Copy Sharing Link"
-                                >
-                                    {copied ? <MdCheck className="text-emerald-600" /> : <MdContentCopy />}
-                                </button>
-                            </div>
-                        )}
-
-
-
-                    </div>
-                </div>
-            </div>
-       
+      <div className="h-screen w-full flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+          <div className="text-slate-500 text-sm font-medium">
+            Loading your resume...
+          </div>
+        </div>
+      </div>
     );
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100/50">
+      <DashbordNavbar />
+
+      <div className="pt-20 pb-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        {/* Header Section */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => navigate("/dashboard")}
+              className="p-2.5 rounded-xl bg-white hover:bg-gray-50 text-gray-600 hover:text-gray-900 transition-all duration-300 shadow-sm border border-gray-200/50"
+            >
+              <MdArrowBack size={20} />
+            </button>
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 flex items-center gap-2">
+                <Sparkles size={24} className="text-amber-400" />
+                {resumeTitle || "My Resume"}
+              </h1>
+              <p className="text-sm text-gray-500 mt-0.5 flex items-center gap-3">
+                <span className="flex items-center gap-1">
+                  <FiUser size={14} />
+                  {ownerName || "User"}
+                </span>
+                <span className="text-gray-300">|</span>
+                <span className="flex items-center gap-1">
+                  <FiCalendar size={14} />
+                  {createdAt
+                    ? new Date(createdAt).toLocaleDateString()
+                    : "Recent"}
+                </span>
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Main Content */}
+        <div className="flex flex-col lg:flex-row gap-6">
+          {/* Left - Resume Preview */}
+          <div className="flex-1 min-w-0">
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-200/50 overflow-hidden">
+              <div className="flex items-center justify-between px-4 sm:px-6 py-3 bg-gray-50/50 border-b border-gray-200/50">
+                <div className="flex items-center gap-2">
+                  <FiFileText size={18} className="text-blue-600" />
+                  <span className="text-sm font-semibold text-gray-700">
+                    Resume Preview
+                  </span>
+                </div>
+                <span className="text-xs text-gray-400">A4 Format</span>
+              </div>
+              <div className="p-4 bg-gray-100/50 flex items-center justify-center max-h-[800px] overflow-y-auto no-scrollbar">
+                <div className="w-full max-w-[210mm] bg-white shadow-xl rounded-lg overflow-hidden">
+                  {htmlPreview ? (
+                    <iframe
+                      srcDoc={htmlPreview}
+                      className="w-full h-[900px] border-none"
+                      sandbox="allow-scripts"
+                      title="Resume Preview"
+                      style={{ background: "white" }}
+                    />
+                  ) : (
+                    <div className="flex flex-col items-center justify-center h-[600px] text-gray-400">
+                      <AlertCircle size={48} />
+                      <p className="mt-4 text-sm">Preview not available</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Right - Controls Panel with Feedback */}
+          <div className="lg:w-[340px] flex-shrink-0">
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-200/50 overflow-hidden sticky top-24">
+              {/* Panel Header */}
+              <div className="px-5 py-4 bg-gradient-to-r from-gray-50 to-gray-100/50 border-b border-gray-200/50">
+                <div className="flex items-center gap-2">
+                  <IoSettingsOutline className="text-gray-600" />
+                  <span className="font-semibold text-gray-800 text-sm">
+                    Document Controls
+                  </span>
+                </div>
+              </div>
+
+              <div className="p-5 space-y-4 max-h-[600px] overflow-y-auto no-scrollbar">
+                {/* PDF Options */}
+                <div>
+                  <label className="text-xs font-medium text-gray-500 uppercase tracking-wider block mb-3">
+                    PDF Options
+                  </label>
+
+                  {pdfUrl && (
+                    <div className="bg-gray-50 rounded-xl p-3 mb-3">
+                      <p className="text-[10px] text-gray-400 font-medium mb-1.5">
+                        PDF URL
+                      </p>
+                      <a
+                        href={pdfUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 text-xs break-all hover:underline"
+                      >
+                        {pdfUrl}
+                      </a>
+                    </div>
+                  )}
+
+                  <div className="flex gap-2">
+                    <button
+                      onClick={openPdfInBrowser}
+                      className="flex-1 py-2.5 bg-orange-500 hover:bg-orange-600 text-white rounded-xl text-xs font-semibold transition-all duration-300"
+                    >
+                      Open in Browser
+                    </button>
+                    <button
+                      onClick={copyPdfLink}
+                      className="flex-1 py-2.5 bg-gray-800 hover:bg-gray-900 text-white rounded-xl text-xs font-semibold transition-all duration-300 flex items-center justify-center gap-1.5"
+                    >
+                      <MdContentCopy size={14} />
+                      Copy Link
+                    </button>
+                  </div>
+                </div>
+
+                <p className="mt-2 text-[11px] leading-relaxed text-orange-600 text-center">
+                  ⚠️ Please save your resume link. If you lose the
+                  link, you may not be able to access your resume again.
+                </p>
+
+                {/* Divider */}
+                <div className="border-t border-gray-200/50"></div>
+
+                {/* ============================================================
+                    USER FEEDBACK SECTION
+                    ============================================================ */}
+                <div>
+                  <label className="text-xs font-medium text-gray-500 uppercase tracking-wider block mb-3">
+                    Share Your Feedback
+                  </label>
+
+                  {feedbackSubmitted ? (
+                    <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4 text-center">
+                      <div className="text-3xl mb-2">🙏</div>
+                      <p className="text-sm font-semibold text-emerald-700">
+                        Thank You!
+                      </p>
+                      <p className="text-xs text-emerald-600 mt-1">
+                        Your feedback helps us improve
+                      </p>
+                    </div>
+                  ) : (
+                    <>
+                      {/* Rating Stars */}
+                      <div className="mb-3">
+                        <p className="text-xs text-gray-500 mb-2">
+                          How would you rate this resume template?
+                        </p>
+                        <div className="flex gap-1">
+                          {[1, 2, 3, 4, 5].map((star) => (
+                            <button
+                              key={star}
+                              onClick={() => setRating(star)}
+                              onMouseEnter={() => setHoverRating(star)}
+                              onMouseLeave={() => setHoverRating(0)}
+                              className="text-2xl transition-all duration-200 hover:scale-110"
+                            >
+                              {star <= (hoverRating || rating) ? (
+                                <MdStar className="text-amber-400" />
+                              ) : (
+                                <MdStarBorder className="text-gray-300" />
+                              )}
+                            </button>
+                          ))}
+                        </div>
+                        <p className="text-[10px] text-gray-400 mt-1">
+                          {rating === 1 && "Poor"}
+                          {rating === 2 && "Fair"}
+                          {rating === 3 && "Good"}
+                          {rating === 4 && "Very Good"}
+                          {rating === 5 && "Excellent!"}
+                        </p>
+                      </div>
+
+                      {/* Emoji Feedback */}
+                      <div className="mb-3">
+                        <p className="text-xs text-gray-500 mb-2">
+                          How do you feel about this resume?
+                        </p>
+                        <div className="flex gap-2 flex-wrap">
+                          {emojiOptions.map((item) => (
+                            <button
+                              key={item.emoji}
+                              onClick={() => setFeedbackEmoji(item.emoji)}
+                              className={`p-2 rounded-lg text-xl transition-all duration-200 ${
+                                feedbackEmoji === item.emoji
+                                  ? "bg-blue-100 border-2 border-blue-400 scale-110"
+                                  : "bg-gray-50 hover:bg-gray-100 border-2 border-transparent"
+                              }`}
+                              title={item.label}
+                            >
+                              {item.emoji}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Feedback Text */}
+                      <div className="mb-3">
+                        <textarea
+                          value={feedbackText}
+                          onChange={(e) => setFeedbackText(e.target.value)}
+                          placeholder="What do you think? Any suggestions for improvement?"
+                          className="w-full px-3 py-2 rounded-lg border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none text-sm resize-none"
+                          rows="3"
+                          maxLength="500"
+                        />
+                        <p className="text-[10px] text-gray-400 text-right">
+                          {feedbackText.length}/500
+                        </p>
+                      </div>
+
+                      {/* Submit Button */}
+                      <button
+                        onClick={handleSubmitFeedback}
+                        disabled={isSubmitting || rating === 0}
+                        className="w-full py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl text-sm font-semibold shadow-md shadow-blue-500/25 hover:shadow-blue-500/40 transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {isSubmitting ? (
+                          <Loader2 size={18} className="animate-spin" />
+                        ) : (
+                          <MdSend size={18} />
+                        )}
+                        {isSubmitting ? "Submitting..." : "Submit Feedback"}
+                      </button>
+                    </>
+                  )}
+                </div>
+
+                {/* Divider */}
+                <div className="border-t border-gray-200/50"></div>
+
+                {/* Back to Dashboard */}
+                <button
+                  onClick={() => navigate("/dashboard")}
+                  className="w-full flex items-center justify-center gap-2 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-medium text-sm transition-all duration-300"
+                >
+                  <MdArrowBack size={18} />
+                  Back to Dashboard
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="mt-8 text-center">
+          <p className="text-sm text-gray-400 flex items-center justify-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block"></span>
+            Your link is safe
+          </p>
+        </div>
+      </div>
+
+      <style>{`
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        iframe { background: white; }
+      `}</style>
+    </div>
+  );
 }
 
 export default ResumeViewPage;
