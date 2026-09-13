@@ -1,5 +1,35 @@
 
+import path from "path";
+import fs from "fs";
+import { pathToFileURL } from "url";
 
+export const loadTemplate = async (category, htmlFile) => {
+  if (!category || !htmlFile) {
+    throw new Error("Template category and htmlFile are required");
+  }
+
+  const filePath = path.resolve(
+    process.cwd(),
+    "templates",
+    "resumeAllTemplates",
+    String(category),
+    `${String(htmlFile)}.js`
+  );
+
+  console.log("Template Path:", filePath);
+
+  if (!fs.existsSync(filePath)) {
+    throw new Error(`Template file not found: ${filePath}`);
+  }
+
+  return import(pathToFileURL(filePath).href);
+};
+
+
+
+
+
+/*
 import path from "path";
 import fs from "fs";
 import { pathToFileURL } from "url";
@@ -35,3 +65,5 @@ export const loadTemplate = async (category, htmlFile) => {
         throw error;
     }
 };
+
+*/

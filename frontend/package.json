@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-  "dev": "nodemon app.js",
+  "dev": "vite --host 0.0.0.0 --port 5173",
   "start": "node server.js",
   "build": "./render-build.sh"
   },

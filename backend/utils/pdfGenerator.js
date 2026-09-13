@@ -1,3 +1,193 @@
+
+
+import puppeteer from "puppeteer";
+import cloudinary from "../config/cloudinary.js";
+
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+const waitForImages = async (page, timeout = 10000) => {
+  await page.evaluate(() => {
+    for (const img of document.images) {
+      img.loading = "eager";
+    }
+  });
+
+  await Promise.race([
+    page.evaluate(async () => {
+      const images = Array.from(document.images);
+
+      await Promise.all(
+        images.map((img) => {
+          if (img.complete) return Promise.resolve();
+
+          return new Promise((resolve) => {
+            const done = () => resolve();
+            img.addEventListener("load", done, { once: true });
+            img.addEventListener("error", done, { once: true });
+          });
+        })
+      );
+    }),
+    sleep(timeout),
+  ]);
+};
+
+export const generatePDF = async (html) => {
+  let browser = null;
+
+  try {
+    if (!html || typeof html !== "string" || !html.trim()) {
+      throw new Error("Generated resume HTML is empty.");
+    }
+
+    console.log("PDF: launching Puppeteer...");
+    console.log("PDF: executable:", puppeteer.executablePath());
+
+    browser = await puppeteer.launch({
+      headless: true,
+      executablePath: puppeteer.executablePath(),
+      args: [
+        "--no-sandbox",
+        "--disable-setuid-sandbox",
+        "--disable-dev-shm-usage",
+        "--disable-gpu",
+        "--no-first-run",
+        "--no-default-browser-check",
+        "--disable-background-networking",
+        "--disable-features=Translate,BackForwardCache",
+      ],
+      timeout: 60000,
+    });
+
+    const page = await browser.newPage();
+
+    page.on("pageerror", (error) => {
+      console.error("PDF PAGE ERROR:", error.message);
+    });
+
+    page.on("requestfailed", (request) => {
+      console.warn(
+        "PDF REQUEST FAILED:",
+        request.url(),
+        request.failure()?.errorText || "unknown"
+      );
+    });
+
+    await page.setViewport({
+      width: 794,
+      height: 1123,
+      deviceScaleFactor: 1,
+    });
+
+    console.log("PDF: loading HTML...");
+    await page.setContent(html, {
+      waitUntil: "domcontentloaded",
+      timeout: 30000,
+    });
+
+    if (page.evaluate) {
+      await page.evaluate(async () => {
+        if (document.fonts?.ready) {
+          await document.fonts.ready;
+        }
+      });
+    }
+
+    await waitForImages(page, 10000);
+    await sleep(250);
+
+    console.log("PDF: creating PDF buffer...");
+    const pdfBuffer = await page.pdf({
+      format: "A4",
+      printBackground: true,
+      preferCSSPageSize: false,
+      margin: {
+        top: "0",
+        right: "0",
+        bottom: "0",
+        left: "0",
+      },
+    });
+
+    if (!pdfBuffer || !pdfBuffer.length) {
+      throw new Error("Puppeteer returned an empty PDF.");
+    }
+
+    console.log(`PDF: generated ${pdfBuffer.length} bytes`);
+
+    await browser.close();
+    browser = null;
+
+    if (
+      !process.env.CLOUDINARY_CLOUD_NAME ||
+      !process.env.CLOUDINARY_API_KEY ||
+      !process.env.CLOUDINARY_API_SECRET
+    ) {
+      throw new Error(
+        "Cloudinary environment variables are missing. Set CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY and CLOUDINARY_API_SECRET on Render."
+      );
+    }
+
+    console.log("PDF: uploading to Cloudinary...");
+
+    const result = await new Promise((resolve, reject) => {
+      const uploadStream = cloudinary.uploader.upload_stream(
+        {
+          folder: "resume",
+          resource_type: "raw",
+          public_id: `resume-${Date.now()}`,
+          format: "pdf",
+          overwrite: false,
+        },
+        (error, uploaded) => {
+          if (error) {
+            reject(error);
+            return;
+          }
+
+          resolve(uploaded);
+        }
+      );
+
+      uploadStream.on("error", reject);
+      uploadStream.end(pdfBuffer);
+    });
+
+    if (!result?.secure_url) {
+      throw new Error("Cloudinary did not return a PDF URL.");
+    }
+
+    console.log("PDF: Cloudinary upload successful");
+    return result.secure_url;
+  } catch (error) {
+    console.error("PDF ERROR:", error);
+
+    throw new Error(`PDF generation failed: ${error.message}`);
+  } finally {
+    if (browser) {
+      try {
+        await browser.close();
+      } catch (closeError) {
+        console.error("PDF: browser close error:", closeError.message);
+      }
+    }
+  }
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
 import puppeteer from "puppeteer";
 import cloudinary from "../config/cloudinary.js";
 
@@ -112,6 +302,9 @@ export const generatePDF = async (html) => {
     throw new Error(`PDF generation failed: ${error.message}`);
   }
 };
+
+
+*/
 
 /*
 import puppeteer from "puppeteer";

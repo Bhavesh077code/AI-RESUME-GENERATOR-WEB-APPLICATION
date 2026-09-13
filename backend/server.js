@@ -1,9 +1,12 @@
+
+
+/*
 import cluster from "cluster";
 import os from "os";
 import "dotenv/config";
 import app from "./app.js";
-import { connectDB } from "./config/db.js";
 import dns from "dns";
+import { connectDB } from "./config/db.js";
 
 dns.setServers(["8.8.8.8", "8.8.4.4"]);
 
@@ -49,3 +52,4 @@ if (process.env.NODE_ENV === "production") {
   startServer();
 } 
 
+*/
