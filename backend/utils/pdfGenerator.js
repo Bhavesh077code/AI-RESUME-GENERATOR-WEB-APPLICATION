@@ -65,7 +65,7 @@ export const generatePDF = async (html) => {
     }
 
     const executablePath = puppeteer.executablePath();
-    console.log("PDF: Chromium:", executablePath);
+    
 
     browser = await puppeteer.launch({
       headless: true,
@@ -86,7 +86,7 @@ export const generatePDF = async (html) => {
     const page = await browser.newPage();
 
     page.on("pageerror", (error) => {
-      console.error("PDF PAGE ERROR:", error.message);
+      
     });
 
     await page.setViewport({
@@ -118,7 +118,7 @@ export const generatePDF = async (html) => {
       throw new Error("Puppeteer returned an empty PDF");
     }
 
-    console.log(`PDF: generated ${pdfBuffer.length} bytes`);
+    
 
     await browser.close();
     browser = null;
@@ -129,10 +129,10 @@ export const generatePDF = async (html) => {
       throw new Error("Cloudinary did not return a PDF URL");
     }
 
-    console.log("PDF: uploaded:", result.secure_url);
+    
     return result.secure_url;
   } catch (error) {
-    console.error("PDF ERROR:", error);
+  
 
     throw new Error(`PDF generation failed: ${error.message}`);
   } finally {
@@ -140,7 +140,7 @@ export const generatePDF = async (html) => {
       try {
         await browser.close();
       } catch (closeError) {
-        console.error("PDF browser close error:", closeError.message);
+        
       }
     }
   }

@@ -140,7 +140,6 @@ export const generateResumePreview = async (req, res) => {
       });
     }
 
-    console.log("DB Template:", templateDoc);
 
     const { category, htmlFile } = templateDoc;
 

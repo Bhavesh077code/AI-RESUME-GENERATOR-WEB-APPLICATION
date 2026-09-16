@@ -9,7 +9,6 @@
 
 
 import { Resume } from "../../module/resumeAllModule/resumeModel.js"
-import mongoose from "mongoose"
 
  export const getUserResumes = async (req, res) => {
   try {

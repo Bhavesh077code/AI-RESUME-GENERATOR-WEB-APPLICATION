@@ -23,7 +23,7 @@ export const loadTemplate = async (category, htmlFile) => {
     `${safeHtmlFile}.js`,
   );
 
-  console.log("Template Path:", filePath);
+
 
   if (!fs.existsSync(filePath)) {
     throw new Error(`Template file not found: ${filePath}`);
