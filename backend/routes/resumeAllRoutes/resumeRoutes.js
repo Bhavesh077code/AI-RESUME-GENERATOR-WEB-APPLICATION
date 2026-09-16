@@ -8,7 +8,7 @@ import { authMiddleware } from "../../middleware/authMiddleware.js";
 import { createResume } from "../../controller/resumeBuilderController/resumecontroller.js";
 import { getUserResumes } from "../../controller/resumeBuilderController/getResumeController.js";
 import { generateProfessionalSummary } from "../../controller/resumeBuilderController/aiSummaryController.js";
-import { updateResume } from "../../controller/resumeBuilderController/updateResumeController.js";
+import { updateResume } from "../../controller/resumeBuilderController/updateResumecontroller.js";
 import { getResumeById } from "../../controller/resumeBuilderController/getResumeIdController.js";
 
 
